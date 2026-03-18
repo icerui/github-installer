@@ -1,0 +1,105 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  unit-tests:
+    name: Unit Tests (Python ${{ matrix.python-version }}, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.10", "3.12", "3.13"]
+    env:
+      PYTHONUTF8: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Run built-in unit tests
+        run: python tools/run_tests.py
+
+      - name: Run pytest unit tests
+        run: |
+          pip install pytest
+          pytest tests/unit/ -v --tb=long 2>&1 | tee pytest_output.txt
+          exit ${PIPESTATUS[0]}
+        shell: bash
+
+      - name: Show failures in summary
+        if: failure()
+        run: |
+          echo "## Pytest Failures" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          grep -A 30 "FAILED\|ERROR\|short test summary" pytest_output.txt | head -200 >> $GITHUB_STEP_SUMMARY || true
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          # Also emit as workflow annotations (visible publicly)
+          grep "FAILED\|ERROR" pytest_output.txt | head -20 | while IFS= read -r line; do
+            echo "::error::$line"
+          done || true
+        shell: bash
+
+  template-tests:
+    name: Template & Coverage Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run template matching tests
+        run: python tests/integration/test_template_matching.py
+
+      - name: Run dataset coverage (small, 108 projects)
+        run: |
+          cd tests/integration
+          if [ ! -f ../fixtures/github_projects.json ]; then
+            echo "⏭️ Skipping: fixture file tests/fixtures/github_projects.json not found (must be generated locally)"
+            exit 0
+          fi
+          python test_dataset_coverage.py --dataset ../fixtures/github_projects.json
+        shell: bash
+
+      - name: Run dataset coverage (large, 750 projects)
+        run: |
+          cd tests/integration
+          if [ ! -f ../fixtures/github_projects_large.json ]; then
+            echo "⏭️ Skipping: fixture file tests/fixtures/github_projects_large.json not found (must be generated locally)"
+            exit 0
+          fi
+          python test_dataset_coverage.py --dataset ../fixtures/github_projects_large.json
+
+  lint:
+    name: Lint & Import Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check all modules import cleanly
+        run: |
+          cd tools
+          python -c "
+          import detector
+          import fetcher
+          import planner
+          import llm
+          import executor
+          import error_fixer
+          import resilience
+          import main
+          print('All modules imported successfully')
+          "

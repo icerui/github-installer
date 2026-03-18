@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gitinstall"
+version = "1.2.0"
+description = "MCP server & CLI that helps you easily install GitHub projects — zero dependencies"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [
+    { name = "icerui" },
+]
+keywords = ["mcp", "mcp-server", "github", "installer", "ai-agent", "claude", "cursor", "automation", "devtools"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Build Tools",
+    "Topic :: System :: Installation/Setup",
+]
+
+[project.scripts]
+gitinstall = "gitinstall.main:cli_main"
+gitinstall-mcp = "gitinstall.mcp_server:serve"
+
+[project.urls]
+Homepage = "https://github.com/icerui/github-installer"
+Repository = "https://github.com/icerui/github-installer"
+Issues = "https://github.com/icerui/github-installer/issues"
+
+[tool.setuptools]
+packages = ["gitinstall"]
+py-modules = []
+
+[tool.setuptools.package-dir]
+gitinstall = "tools"
+
+[tool.setuptools.package-data]
+gitinstall = ["*.html"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["tools"]

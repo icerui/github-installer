@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>gitinstall — 管理后台</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0a0a0f;
+  --bg-card: rgba(255,255,255,0.03);
+  --bg-glass: rgba(255,255,255,0.04);
+  --bg-elevated: rgba(255,255,255,0.06);
+  --border: rgba(255,255,255,0.06);
+  --border-hover: rgba(255,255,255,0.12);
+  --text: #f0f0f5;
+  --text-sec: #94949e;
+  --text-muted: #5a5a66;
+  --accent: #8b5cf6;
+  --accent-3: #a78bfa;
+  --cyan: #22d3ee;
+  --green: #34d399;
+  --red: #f87171;
+  --amber: #fbbf24;
+  --mono: 'JetBrains Mono','SF Mono',Consolas,monospace;
+  --sans: 'Inter',system-ui,-apple-system,sans-serif;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --radius-xs: 6px;
+}
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+.app { max-width: 960px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.3rem; }
+.subtitle { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 2rem; }
+
+/* Auth gate */
+.auth-gate {
+  max-width: 380px;
+  margin: 4rem auto;
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2rem;
+  text-align: center;
+}
+.auth-gate h2 { font-size: 1.1rem; margin-bottom: 1rem; }
+.auth-gate input {
+  display: block; width: 100%; padding: 0.6rem 0.8rem; margin-bottom: 0.6rem;
+  background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+  border-radius: var(--radius-xs); color: var(--text); font-size: 0.85rem;
+  font-family: var(--sans); outline: none;
+}
+.auth-gate input:focus { border-color: var(--accent); }
+.auth-gate button {
+  width: 100%; padding: 0.6rem; margin-top: 0.3rem;
+  background: linear-gradient(135deg, var(--accent), #6366f1);
+  border: none; border-radius: var(--radius-xs);
+  color: #fff; font-size: 0.85rem; cursor: pointer;
+  font-family: var(--sans); font-weight: 600;
+}
+.auth-gate button:hover { opacity: 0.9; }
+.auth-msg { margin-top: 0.5rem; font-size: 0.8rem; color: var(--red); min-height: 1.2rem; }
+
+/* Dashboard */
+.dashboard { display: none; }
+.dashboard.visible { display: block; }
+
+.stats-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem;
+}
+@media (max-width: 600px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+.stat-item {
+  text-align: center; padding: 1.2rem 0.5rem;
+  background: var(--bg-glass); border-radius: var(--radius-sm); border: 1px solid var(--border);
+}
+.stat-num {
+  font-size: 1.8rem; font-weight: 700; font-family: var(--mono);
+  background: linear-gradient(135deg, var(--accent), var(--cyan));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.stat-label { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.3rem; }
+
+.panel {
+  background: var(--bg-glass); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 1rem;
+}
+.panel-title { font-size: 0.85rem; font-weight: 600; color: var(--text-sec); margin-bottom: 0.6rem; }
+
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+@media (max-width: 600px) { .detail-grid { grid-template-columns: 1fr; } }
+
+.row { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; padding: 0.3rem 0; color: var(--text-sec); }
+.bar { height: 4px; background: var(--bg-elevated); border-radius: 2px; flex: 1; margin: 0 0.6rem; overflow: hidden; }
+.bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--cyan)); border-radius: 2px; }
+
+/* Recent installs table */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+th { text-align: left; color: var(--text-muted); font-weight: 600; padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--border); }
+td { padding: 0.5rem 0.6rem; border-bottom: 1px solid rgba(255,255,255,0.03); color: var(--text-sec); }
+.badge-ok { color: var(--green); }
+.badge-fail { color: var(--red); }
+
+/* Daily trend chart (simple CSS bars) */
+.trend-chart { display: flex; align-items: flex-end; gap: 2px; height: 80px; margin-top: 0.5rem; }
+.trend-bar {
+  flex: 1; background: linear-gradient(to top, var(--accent), var(--cyan));
+  border-radius: 2px 2px 0 0; min-width: 4px; transition: height 0.4s;
+}
+
+.btn-back {
+  display: inline-block; margin-bottom: 1.5rem; color: var(--text-muted); font-size: 0.8rem;
+  text-decoration: none; border: 1px solid var(--border); padding: 0.3rem 0.8rem;
+  border-radius: var(--radius-xs);
+}
+.btn-back:hover { color: var(--text); border-color: var(--border-hover); }
+
+.header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem; }
+.btn-logout {
+  background: none; border: 1px solid rgba(248,113,113,0.3); color: var(--red);
+  padding: 0.3rem 0.8rem; border-radius: var(--radius-xs); cursor: pointer;
+  font-size: 0.75rem; font-family: var(--sans);
+}
+.btn-logout:hover { background: rgba(248,113,113,0.1); }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Auth gate -->
+  <div class="auth-gate" id="auth-gate">
+    <h2>🔒 管理后台</h2>
+    <p style="color:var(--text-muted);font-size:0.8rem;margin-bottom:1rem">请使用管理员账号登录</p>
+    <form onsubmit="adminLogin(event)">
+      <input type="email" id="admin-email" placeholder="管理员邮箱" required>
+      <input type="password" id="admin-pw" placeholder="密码" required>
+      <button type="submit">登录</button>
+    </form>
+    <div class="auth-msg" id="auth-msg"></div>
+  </div>
+
+  <!-- Dashboard (hidden until auth) -->
+  <div class="dashboard" id="dashboard">
+    <a class="btn-back" href="/">← 返回主页</a>
+    <div class="header-row">
+      <div>
+        <h1>📊 gitinstall 管理后台</h1>
+        <div class="subtitle">欢迎，<span id="admin-name"></span></div>
+      </div>
+      <button class="btn-logout" onclick="adminLogout()">退出</button>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-item"><div class="stat-num" id="s-plans">-</div><div class="stat-label">安装计划</div></div>
+      <div class="stat-item"><div class="stat-num" id="s-installs">-</div><div class="stat-label">成功安装</div></div>
+      <div class="stat-item"><div class="stat-num" id="s-users">-</div><div class="stat-label">注册用户</div></div>
+      <div class="stat-item"><div class="stat-num" id="s-rate">-</div><div class="stat-label">成功率</div></div>
+    </div>
+
+    <div class="detail-grid">
+      <div class="panel">
+        <div class="panel-title">🏆 热门项目</div>
+        <div id="top-projects"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">💻 操作系统分布</div>
+        <div id="os-dist"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">📈 近 30 天趋势</div>
+      <div class="trend-chart" id="trend-chart"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">🕐 最近安装</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>项目</th><th>策略</th><th>置信度</th><th>结果</th><th>耗时</th></tr></thead>
+          <tbody id="recent-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+let adminToken = localStorage.getItem('gitinstall_admin_token') || '';
+
+// Try auto-login if token exists
+if (adminToken) loadDashboard();
+
+async function adminLogin(e) {
+  e.preventDefault();
+  const msg = $('auth-msg');
+  msg.textContent = '登录中...';
+  msg.style.color = 'var(--text-muted)';
+  try {
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ email: $('admin-email').value, password: $('admin-pw').value }),
+    });
+    const d = await res.json();
+    if (d.status !== 'ok') { msg.textContent = d.message || '登录失败'; msg.style.color = ''; return; }
+    adminToken = d.token;
+    localStorage.setItem('gitinstall_admin_token', adminToken);
+    loadDashboard();
+  } catch (err) {
+    msg.textContent = '网络错误';
+    msg.style.color = '';
+  }
+}
+
+async function loadDashboard() {
+  try {
+    const res = await fetch('/api/stats', {
+      headers: {'Authorization': 'Bearer ' + adminToken},
+    });
+    const d = await res.json();
+    if (d.status !== 'ok') {
+      // Not admin or token expired
+      adminToken = '';
+      localStorage.removeItem('gitinstall_admin_token');
+      $('auth-gate').style.display = '';
+      $('dashboard').classList.remove('visible');
+      $('auth-msg').textContent = d.message || '权限不足，请使用管理员账号';
+      $('auth-msg').style.color = '';
+      return;
+    }
+
+    // Get user info
+    const userRes = await fetch('/api/user', { headers: {'Authorization': 'Bearer ' + adminToken} });
+    const userData = await userRes.json();
+    $('admin-name').textContent = userData.user ? userData.user.username : '管理员';
+
+    // Show dashboard
+    $('auth-gate').style.display = 'none';
+    $('dashboard').classList.add('visible');
+
+    // Fill stats
+    $('s-plans').textContent = fmtNum(d.total_plans);
+    $('s-installs').textContent = fmtNum(d.total_installs);
+    $('s-users').textContent = fmtNum(d.total_users);
+    $('s-rate').textContent = d.success_rate + '%';
+
+    // Top projects
+    if (d.top_projects && d.top_projects.length) {
+      const max = d.top_projects[0].count;
+      $('top-projects').innerHTML = d.top_projects.map(p => {
+        const pct = Math.round(p.count / max * 100);
+        return `<div class="row"><span>${esc(p.project)}</span><div class="bar"><div class="bar-fill" style="width:${pct}%"></div></div><span>${p.count}</span></div>`;
+      }).join('');
+    } else {
+      $('top-projects').innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem">暂无数据</div>';
+    }
+
+    // OS distribution
+    if (d.os_distribution && d.os_distribution.length) {
+      const total = d.os_distribution.reduce((s, o) => s + o.count, 0);
+      $('os-dist').innerHTML = d.os_distribution.map(o => {
+        const pct = Math.round(o.count / total * 100);
+        return `<div class="row"><span>${esc(o.os)}</span><div class="bar"><div class="bar-fill" style="width:${pct}%"></div></div><span>${pct}%</span></div>`;
+      }).join('');
+    } else {
+      $('os-dist').innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem">暂无数据</div>';
+    }
+
+    // Daily trend
+    if (d.daily_trend && d.daily_trend.length) {
+      const maxC = Math.max(...d.daily_trend.map(t => t.count));
+      $('trend-chart').innerHTML = d.daily_trend.map(t => {
+        const h = Math.max(4, Math.round(t.count / maxC * 76));
+        return `<div class="trend-bar" style="height:${h}px" title="${t.date}: ${t.count}"></div>`;
+      }).join('');
+    }
+
+    // Recent installs
+    if (d.recent_installs && d.recent_installs.length) {
+      $('recent-tbody').innerHTML = d.recent_installs.map(r => {
+        const ok = r.success;
+        const badge = ok === true ? '<span class="badge-ok">✓ 成功</span>'
+                    : ok === false ? '<span class="badge-fail">✗ 失败</span>'
+                    : '<span style="color:var(--text-muted)">-</span>';
+        const dur = r.duration != null ? r.duration + 's' : '-';
+        return `<tr><td>${esc(r.project)}</td><td>${esc(r.strategy||'-')}</td><td>${esc(r.confidence||'-')}</td><td>${badge}</td><td>${dur}</td></tr>`;
+      }).join('');
+    }
+
+  } catch (err) {
+    $('auth-msg').textContent = '加载失败：' + err.message;
+  }
+}
+
+function adminLogout() {
+  adminToken = '';
+  localStorage.removeItem('gitinstall_admin_token');
+  $('auth-gate').style.display = '';
+  $('dashboard').classList.remove('visible');
+}
+
+function fmtNum(n) {
+  if (typeof n !== 'number') return '0';
+  if (n >= 10000) return (n / 10000).toFixed(1) + 'w';
+  if (n >= 1000) return (n / 1000).toFixed(1) + 'k';
+  return String(n);
+}
+
+function esc(s) {
+  if (!s) return '';
+  const d = document.createElement('div');
+  d.textContent = String(s);
+  return d.innerHTML;
+}
+</script>
+</body>
+</html>

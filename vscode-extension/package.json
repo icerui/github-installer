@@ -1,0 +1,160 @@
+{
+  "name": "gitinstall",
+  "displayName": "GitInstall - One-Click GitHub Project Installer",
+  "description": "让你轻松安装 GitHub 项目。自动检测语言、生成安装步骤、执行安装、处理报错。支持 AI 辅助和 VRAM 评估。",
+  "version": "1.0.0",
+  "publisher": "gitinstall",
+  "license": "MIT",
+  "icon": "media/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gitinstall/vscode-gitinstall"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other",
+    "Programming Languages",
+    "Machine Learning"
+  ],
+  "keywords": [
+    "github",
+    "install",
+    "setup",
+    "ai",
+    "huggingface",
+    "llm",
+    "vram"
+  ],
+  "activationEvents": [
+    "onUri",
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "gitinstall.install",
+        "title": "GitInstall: Install GitHub Project",
+        "icon": "$(cloud-download)"
+      },
+      {
+        "command": "gitinstall.installFromClipboard",
+        "title": "GitInstall: Install from Clipboard URL"
+      },
+      {
+        "command": "gitinstall.audit",
+        "title": "GitInstall: Security Audit Current Project"
+      },
+      {
+        "command": "gitinstall.vramEstimate",
+        "title": "GitInstall: Estimate VRAM for AI Model"
+      },
+      {
+        "command": "gitinstall.generateSBOM",
+        "title": "GitInstall: Generate SBOM"
+      },
+      {
+        "command": "gitinstall.showDashboard",
+        "title": "GitInstall: Show Dashboard"
+      },
+      {
+        "command": "gitinstall.generateCI",
+        "title": "GitInstall: Generate CI/CD Config"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "gitinstall",
+          "title": "GitInstall",
+          "icon": "media/sidebar-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "gitinstall": [
+        {
+          "id": "gitinstall.recentInstalls",
+          "name": "Recent Installs"
+        },
+        {
+          "id": "gitinstall.audit",
+          "name": "Security Audit"
+        },
+        {
+          "id": "gitinstall.aiModels",
+          "name": "AI Models"
+        }
+      ]
+    },
+    "menus": {
+      "commandPalette": [
+        { "command": "gitinstall.install" },
+        { "command": "gitinstall.installFromClipboard" },
+        { "command": "gitinstall.audit" },
+        { "command": "gitinstall.vramEstimate" },
+        { "command": "gitinstall.generateSBOM" },
+        { "command": "gitinstall.showDashboard" },
+        { "command": "gitinstall.generateCI" }
+      ]
+    },
+    "configuration": {
+      "title": "GitInstall",
+      "properties": {
+        "gitinstall.pythonPath": {
+          "type": "string",
+          "default": "python3",
+          "description": "Path to Python interpreter (3.10+)"
+        },
+        "gitinstall.installDirectory": {
+          "type": "string",
+          "default": "",
+          "description": "Default directory for installing projects"
+        },
+        "gitinstall.autoAudit": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically run security audit before installation"
+        },
+        "gitinstall.llmProvider": {
+          "type": "string",
+          "enum": ["auto", "anthropic", "openai", "deepseek", "dashscope", "ollama", "none"],
+          "default": "auto",
+          "description": "LLM provider for intelligent install planning"
+        },
+        "gitinstall.confirmBeforeExecute": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show confirmation before executing install commands"
+        },
+        "gitinstall.mirrorPypi": {
+          "type": "string",
+          "default": "",
+          "description": "PyPI mirror URL (e.g., https://pypi.tuna.tsinghua.edu.cn/simple)"
+        },
+        "gitinstall.mirrorNpm": {
+          "type": "string",
+          "default": "",
+          "description": "npm mirror URL (e.g., https://registry.npmmirror.com)"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts",
+    "package": "vsce package",
+    "publish": "vsce publish"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^3.0.0",
+    "eslint": "^9.0.0",
+    "typescript": "^5.4.0"
+  }
+}

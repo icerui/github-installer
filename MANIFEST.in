@@ -1,0 +1,18 @@
+include LICENSE
+include README.md
+include pyproject.toml
+recursive-include tools *.py *.html
+prune tests
+prune vscode-extension
+prune .github
+exclude MARKET_RESEARCH_2026.md
+exclude PROJECT_BLUEPRINT.md
+exclude COVERAGE_GAP_REPORT.md
+exclude FEATURE_CATALOG.md
+exclude DEPLOY.md
+exclude ROADMAP.md
+exclude Dockerfile
+exclude .dockerignore
+exclude smithery.yaml
+exclude SKILL.md
+exclude SDK.md

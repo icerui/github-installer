@@ -1,0 +1,76 @@
+# Byte-compiled / optimized
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.env
+.venv/
+env/
+venv/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# Test fixtures (large, generated on demand)
+tests/fixtures/*.json
+
+# Test results (generated per run)
+tests/results/
+tests/integration/results/
+tests/audit_results.json
+tests/install_audit_results.json
+
+# Distribution
+dist/
+build/
+*.egg-info/
+
+# Test artifacts
+.coverage
+tests/_setup_admin.py
+
+# Internal documents (not for public release)
+ROADMAP.md
+MARKET_RESEARCH_2026.md
+PROJECT_BLUEPRINT.md
+COVERAGE_GAP_REPORT.md
+FEATURE_CATALOG.md
+DEPLOY.md
+
+# Internal test/audit scripts (not needed in CI)
+tests/E2E_REPORT.md
+tests/final_audit.py
+tests/pre_publish_audit.py
+tests/pre_release_audit.py
+tests/analyze_audit.py
+tests/analyze_combined.py
+tests/verify_pypi.py
+tests/random_audit.py
+tests/test_mcp_full.py
+tests/test_mcp_server.py
+tests/test_imports.py
+tests/test_install_audit.py
+tests/test_random_audit.py
+tests/test_full_suite.py
+tests/test_new_modules.py
+tests/test_chaos_torture.py
+tests/test_million_scale_simulation.py
+tests/test_global_year_simulation.py
+tests/test_year_simulation.py
+tests/test_trending_crossplatform.py
+tests/_security_smoke.py
+tests/_smoke_test.py
+tests/platform_audit.py
+tests/tools/crawl_github.py
+tests/tools/generate_coverage_tests.py
+tests/integration/random_audit_report.json
+tests/integration/test_100_personas.py
+tests/integration/test_scale_simulation.py
+tests/integration/test_yearly_simulation.py
+tests/integration/test_install_e2e.py
+tests/unit/test_random_audit_selection.py
