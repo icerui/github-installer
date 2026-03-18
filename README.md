@@ -1,7 +1,7 @@
 # gitinstall
 
 <p align="center">
-  <strong>MCP server & CLI — helps you easily install GitHub projects</strong><br/>
+  <strong>MCP server, Web UI & CLI — helps you easily install GitHub projects</strong><br/>
   <em>让你轻松安装 GitHub 项目</em>
 </p>
 
@@ -34,6 +34,23 @@ AI agents can write code, explain errors, and suggest commands — but they **ca
 ---
 
 ## Quick Start
+
+### Web UI (Recommended for beginners / 推荐新手使用)
+
+```bash
+pip install gitinstall
+gitinstall web
+```
+
+Your browser opens automatically at `http://localhost:8080`:
+
+1. **Paste** a GitHub URL or project name (e.g. `comfyanonymous/ComfyUI`)
+2. **Click** "分析项目" to preview the install plan
+3. **Click** "开始安装" — done!
+
+No terminal needed after setup. Everything happens in the browser.
+
+> 安装后只需一行命令 `gitinstall web`，浏览器自动打开，粘贴链接 → 点击安装，全程鼠标操作。
 
 ### For Claude Desktop
 
@@ -169,7 +186,8 @@ Pure Python standard library. No `requests`, no `click`, no `rich`. One `pip ins
 gitinstall works standalone too, no AI agent needed:
 
 ```bash
-gitinstall comfyanonymous/ComfyUI     # Install a project
+gitinstall web                         # Launch Web UI in browser (recommended)
+gitinstall comfyanonymous/ComfyUI      # Install a project
 gitinstall uninstall comfyanonymous/ComfyUI --confirm  # Safely uninstall
 gitinstall detect                      # Check your system
 gitinstall doctor                      # System diagnostic

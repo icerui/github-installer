@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "gitinstall"
 version = "1.2.0"
-description = "MCP server & CLI that helps you easily install GitHub projects — zero dependencies"
+description = "MCP server, Web UI & CLI that helps you easily install GitHub projects — zero dependencies"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"

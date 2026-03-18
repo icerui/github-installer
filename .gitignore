@@ -41,6 +41,7 @@ PROJECT_BLUEPRINT.md
 COVERAGE_GAP_REPORT.md
 FEATURE_CATALOG.md
 DEPLOY.md
+POST_PUBLISH_ISSUES.md
 
 # Internal test/audit scripts (not needed in CI)
 tests/E2E_REPORT.md
